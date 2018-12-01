@@ -3,28 +3,24 @@ const inputPasswordRegistration = document.getElementById('input-password-regist
 const inputPasswordRepeatRegistration = document.getElementById('input-passwordRepeat-registration');
 const btnLogin = document.getElementById('btnLogin');
 const btnRegistration = document.getElementById('btnRegistration');
-const maneBtn = document.getElementById('maneBtn');
 const errorRegistration = document.getElementById('error-registration');
 
-
-maneBtn.addEventListener('click', () => {
-    window.location.replace('./')
-});
 btnLogin.addEventListener('click', function () {
-    window.location.replace('./login.html')
+    window.location.replace('./login')
 });
 
 btnRegistration.addEventListener('click', getRegistration);
 
 function getRegistration() {
-
     clear();
     const usernameRegistrationValue = inputUsernameRegistration.value;
     const passwordRegistrationValue = inputPasswordRegistration.value;
     const passwordRegistrationRepeatValue = inputPasswordRepeatRegistration.value;
-
+    if (usernameRegistrationValue === '' || passwordRegistrationValue === '' || passwordRegistrationRepeatValue === ''){
+        return errorRegistration.innerHTML = 'All fields are required';
+    }
     if (passwordRegistrationValue !== passwordRegistrationRepeatValue) {
-       return errorRegistration.innerHTML = 'Passwords do not match';
+        return errorRegistration.innerHTML = 'Passwords do not match';
     }
     let user = {
         username: usernameRegistrationValue,
@@ -42,13 +38,13 @@ function getRegistration() {
     xhr.onreadystatechange = function () {
         if (xhr.readyState !== 4) return;
         if (xhr.response.error) {
-            return errorRegistration.innerHTML = 'ошибка: ' +  xhr.response.error.message;
-        } 
+            return errorRegistration.innerHTML = 'Error: ' +  xhr.response.error.message;
+        }
         if (xhr.status !== 200) {
-           return errorRegistration.innerHTML = 'ошибка: ' + (this.status ? this.statusText : 'запрос не удался');
+            return errorRegistration.innerHTML = 'Error: ' + (this.status ? this.statusText : 'запрос не удался');
         }
         if (xhr.response.success) {
-            window.location.replace('./login.html');
+            window.location.replace('./login');
         }
     };
 }

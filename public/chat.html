@@ -5,6 +5,25 @@
     <title>Title</title>
 </head>
 <body>
-    Chat here
+<div class="container">
+    <p>Chat here</p>
+    <p>You are logged in as: <span id="ownName"></span> </p>
+    <div class="form-btn">
+        <button id="btnLogout" class="btn">Logout</button>
+    </div>
+    <div class="form-btn" id="hideError">
+        <ul id="chatBlock"></ul>
+        <input type="text" id="inputMessage" autocomplete="off" autofocus placeholder="Message...">
+        <button id="btnSend" class="btn">Send</button>
+    </div>
+</div>
+<div>
+    <p>Users online</p>
+    <div class="onlineUsers" id="onlineUsers">
+
+    </div>
+</div>
+
+<script src="js/chat.js"></script>
 </body>
 </html>

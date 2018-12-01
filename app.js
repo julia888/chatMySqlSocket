@@ -5,6 +5,8 @@ const createError = require('http-errors');
 const bodyParser = require('body-parser');
 const app = express();
 const mysql = require('mysql');
+const WebSocket = require('ws');
+
 
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.urlencoded({extended: false}));
@@ -33,7 +35,7 @@ function handleDisconnect() {
             throw err;
         }
     });
-    console.log('db connected');
+    // console.log('db connected');
 }
 
 handleDisconnect();
@@ -55,8 +57,14 @@ connection.query('CREATE DATABASE IF NOT EXISTS chatdb', function (err) {
     // console.log("Database created");
 });
 
-app.post('/all', function (req, res) {
-    res.send('dddd');
+app.get('/login', function (req, res) {
+    res.sendFile(path.join(__dirname, '/public', 'index.html'));
+});
+app.get('/registration', function (req, res) {
+    res.sendFile(path.join(__dirname, '/public', 'registration.html'));
+});
+app.get('/chat', function (req, res) {
+    res.sendFile(path.join(__dirname, '/public', 'chat.html'));
 });
 
 app.post('/registration', function (req, res) {
@@ -67,7 +75,6 @@ app.post('/registration', function (req, res) {
         if (err) throw err;
         console.log(result.length);
         if (result.length) {
-
             return res.status(400).send({error: {message: "Login is already exists!"}});
         } else {
             const sql = "INSERT INTO users (username, password) VALUES ?";
@@ -83,9 +90,11 @@ app.post('/registration', function (req, res) {
     });
 });
 
+let user = null;
 app.post('/login', function (req, res) {
     res.setHeader("Access-Control-Allow-Origin", '*');
     const username = req.body.username;
+    user = username;
     const password = req.body.password;
     connection.query('SELECT * FROM users WHERE username=?', [username], function (err, result) {
         if (err) throw err;
@@ -93,10 +102,9 @@ app.post('/login', function (req, res) {
         // console.log(result.length);
         if (result.length !== 0) {
             if (result[0].password !== password) {
-                 res.status(400).send({error:{message: 'Wrong password'}});
+                res.status(400).send({error:{message: 'Wrong password'}});
             }else {
-               return res.send({success: {message: "You login!"}});
-
+                return res.send({success: {message: "You are login!"}});
             }
         } else {
             return res.send({errorNull:{ message: "User is not in the database!"}});
@@ -114,7 +122,41 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.status(404).send('Ресурс не найден');
 });
+
 const server = http.createServer(app);
+const ws = new WebSocket.Server({server});
+let clients = {};
+let userArray = [];
+ws.on('connection', function(ws) {
+    clients[user] = ws;
+    userArray.push(user);
+    console.log("новое соединение " + user);
+    console.log(userArray);
+    for (let key in clients) {
+        let userJoin = user + ' joined';
+        let jsonUsers = {userArray: userArray, full: userJoin};
+        clients[key].send(JSON.stringify(jsonUsers));
+        // clients[key].send(user + ' : joined');
+    }
+    ws.on('message', function(message) {
+        let fullMessage = JSON.parse(message);
+        user = fullMessage.nameUser;
+        message = fullMessage.inputMessageValue;
+        console.log('от ' + user + ' получено сообщение ' + message);
+        let userMessage = user + ' : ' + message;
+        let jsonUser =  {userArray: userArray, full: userMessage};
+        for (let key in clients) {
+            clients[key].send(JSON.stringify(jsonUser));
+        }
+    });
+    ws.on('close', function() {
+        console.log('соединение закрыто ' + user);
+        userArray.splice(userArray.indexOf(user), 1);
+        console.log(userArray);
+        delete clients[user];
+    });
+});
+
 server.listen(8089, () => {
     console.log('server start on http://localhost:8089');
 });
