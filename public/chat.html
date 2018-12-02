@@ -2,27 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
 </head>
 <body>
-<div class="container">
+<div class="container Chat">
     <p>Chat here</p>
-    <p>You are logged in as: <span id="ownName"></span> </p>
+    <div class="owner">
+        <p>You are logged in as: <span id="ownName"></span> </p>
+    </div>
     <div class="form-btn">
-        <button id="btnLogout" class="btn">Logout</button>
+        <button id="btnLogout" class="btn">Log out</button>
     </div>
-    <div class="form-btn" id="hideError">
-        <ul id="chatBlock"></ul>
-        <input type="text" id="inputMessage" autocomplete="off" autofocus placeholder="Message...">
-        <button id="btnSend" class="btn">Send</button>
-    </div>
-</div>
-<div>
-    <p>Users online</p>
-    <div class="onlineUsers" id="onlineUsers">
+    <div class="onlineUsersListAndChat">
+        <div class="onlineUsersList">
+            <p>Users online</p>
+            <div class="onlineUsers" id="onlineUsers">
 
+            </div>
+        </div>
+        <div class="form-btn" id="hideError">
+            <ul id="chatBlock">
+            </ul>
+            <input type="text" id="inputMessage" autocomplete="off" autofocus placeholder="Message...">
+            <button id="btnSend" class="btn">Send</button>
+        </div>
     </div>
 </div>
+
 
 <script src="js/chat.js"></script>
 </body>
